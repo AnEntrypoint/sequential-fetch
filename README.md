@@ -1,168 +1,211 @@
-# ProAdmin Master Dashboard
+# XState Interactive State Machine Playground
 
-A comprehensive, professional admin dashboard template with a modern dark theme, clean interface, and responsive design. This dashboard provides a complete foundation for building sophisticated admin interfaces with real-time data visualization, user management, and system monitoring capabilities.
+A comprehensive interactive playground for exploring XState state machines. This web application allows you to create, visualize, and test state machine configurations with real-time visual feedback and execution capabilities.
 
 ## Features
 
-### 🎨 Modern Design
-- **Dark Theme**: Professional dark color scheme with purple accent colors
-- **Responsive Layout**: Fully responsive design that works on all devices
-- **Clean Interface**: Minimalist design with intuitive navigation
-- **Interactive Elements**: Smooth animations and hover effects
+### Core Functionality
+- **Live State Machine Editor**: Edit JSON configuration in real-time with validation
+- **Visual State Machine Representation**: Interactive canvas showing states, transitions, and current active state
+- **State Machine Execution**: Send events to trigger state transitions
+- **Execution History**: Complete log of all state transitions with timestamps
 
-### 📊 Dashboard Components
-- **Statistics Cards**: Real-time metrics display with icons
-- **Interactive Charts**: Bar charts for data visualization
-- **User Management**: Comprehensive user table with actions
-- **Recent Activity**: Activity timeline for system events
+### State Machine Support
+- Multiple states (idle, loading, success, error, etc.)
+- Event-driven transitions (START, FETCH, RETRY, RESET, etc.)
+- Support for nested states and parallel states
+- Custom state metadata and styling
 
-### 🎯 Key Features
-- **Sidebar Navigation**: Collapsible menu with active state indicators
-- **Top Navigation**: Search bar, notifications, and user profile
-- **Data Tables**: Sortable and filterable data displays
-- **Quick Actions**: Dropdown menus for common operations
+### UI Features
+- Split-screen layout with editor and visualization
+- Real-time validation and error handling
+- Responsive design for desktop and mobile
+- Interactive event buttons for each available transition
+- Color-coded state visualization
 
-## 📁 File Structure
+## Project Structure
 
 ```
-proadmin-dashboard/
-├── index.html          # Main HTML structure
-├── styles.css          # Complete styling with dark theme
-├── script.js           # Interactive JavaScript functionality
-├── package.json        # Project configuration
+xstate/
+├── index.html          # Main HTML file with application layout
+├── script.js           # Core application logic and XState integration
+├── styles.css          # Complete styling for responsive design
+├── package.json        # Dependencies and project configuration
 ├── vercel.json         # Vercel deployment configuration
-└── README.md           # Project documentation
+└── README.md           # This documentation
 ```
 
-## 🚀 Quick Start
+## Dependencies
 
-### Prerequisites
-- Modern web browser (Chrome, Firefox, Safari, Edge)
-- Local web server (optional, for development)
+- **XState v5.26.0**: State machine library for creating, interpreting, and visualizing state machines
+- **Bootstrap v5.3.3**: CSS framework for responsive UI components
 
-### Installation
+## Installation and Usage
 
-1. **Clone or Download** the project files
-2. **Open `index.html`** in your browser
-3. **Optional**: Use a local server for development:
-   ```bash
-   # Using Python
-   python -m http.server 8000
-   
-   # Using Node.js
-   npx serve .
-   
-   # Using PHP
-   php -S localhost:8000
-   ```
+### Local Development
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd xstate
+```
 
-### Development
+2. Install dependencies:
+```bash
+npm install
+```
 
-The project is ready to use out of the box. For customization:
+3. Start local development server:
+```bash
+# Using Python 3
+python -m http.server 8000
 
-1. **Modify `styles.css`** to change colors, layouts, and themes
-2. **Edit `script.js`** to add new interactive features
-3. **Update `index.html`** to modify the dashboard structure
+# Using Node.js serve (if installed)
+npx serve .
 
-## 🛠️ Customization Guide
+# Or open index.html directly in a browser
+```
 
-### Colors and Theme
-The dashboard uses a dark theme with purple accents. Modify the CSS variables in `styles.css`:
+### Using the Playground
 
-```css
-:root {
-  --primary-color: #6366f1;    /* Purple accent */
-  --background-dark: #0f172a;  /* Main background */
-  --card-background: #1e293b;  /* Card backgrounds */
-  /* Add more variables as needed */
+1. **Load Examples**: Click the "Load Example" button to see pre-configured state machines
+2. **Edit Configuration**: Modify the JSON in the editor panel
+3. **Apply Changes**: Click "Apply Configuration" to update the state machine
+4. **Visualize**: Watch the state machine visualization update in real-time
+5. **Test Transitions**: Click event buttons to trigger state transitions
+6. **Monitor History**: View the execution history in the log panel
+
+## Configuration Format
+
+The state machine configuration follows XState format:
+
+```json
+{
+  "id": "machine-id",
+  "initial": "initial-state",
+  "states": {
+    "stateName": {
+      "on": {
+        "EVENT_NAME": "target-state"
+      }
+    }
+  }
 }
 ```
 
-### Adding New Components
-1. Add HTML structure to `index.html`
-2. Style the component in `styles.css`
-3. Add interactivity in `script.js`
+### Example Configurations
 
-### Chart Customization
-Charts are created using Chart.js. To modify:
-
-```javascript
-// In script.js, find the chart configuration
-const chartConfig = {
-  type: 'bar',
-  data: {
-    labels: ['Jan', 'Feb', 'Mar'], // Customize labels
-    datasets: [{
-      label: 'Revenue', // Customize dataset
-      data: [65, 59, 80] // Your data here
-    }]
+#### Simple Toggle Machine
+```json
+{
+  "id": "toggle",
+  "initial": "inactive",
+  "states": {
+    "inactive": {
+      "on": { "TOGGLE": "active" }
+    },
+    "active": {
+      "on": { "TOGGLE": "inactive" }
+    }
   }
-};
+}
 ```
 
-## 📱 Responsive Design
+#### Data Fetching Machine
+```json
+{
+  "id": "fetch",
+  "initial": "idle",
+  "states": {
+    "idle": {
+      "on": { "FETCH": "loading" }
+    },
+    "loading": {
+      "on": {
+        "RESOLVE": "success",
+        "REJECT": "failure"
+      }
+    },
+    "success": {
+      "on": { "RESET": "idle" }
+    },
+    "failure": {
+      "on": { "RETRY": "loading" }
+    }
+  }
+}
+```
 
-The dashboard is fully responsive with breakpoints for:
-- **Desktop**: 1024px and above
-- **Tablet**: 768px - 1023px
-- **Mobile**: Below 768px
+## Event System
 
-## 🔧 Technical Details
+The playground supports dynamic event handling:
+- Events are automatically detected from the state machine configuration
+- Buttons are generated for each available transition
+- Events can include payloads for complex state transitions
+- Real-time feedback shows which events are available in the current state
 
-### Technologies Used
-- **HTML5**: Semantic markup structure
-- **CSS3**: Modern styling with flexbox and grid
-- **Vanilla JavaScript**: Interactive features (no frameworks required)
-- **Chart.js**: Data visualization library
-- **Font Awesome**: Icon library
+## State Machine Types Supported
 
-### Browser Compatibility
+- **Finite State Machines**: Simple state-to-state transitions
+- **Hierarchical State Machines**: Nested states with parent-child relationships
+- **Parallel State Machines**: Concurrent states that run simultaneously
+- **Extended State Machines**: States with context and extended data
+
+## Deployment
+
+This project is configured for deployment on Vercel:
+
+1. Connect your repository to Vercel
+2. Vercel will automatically detect the configuration from `vercel.json`
+3. The site will be deployed with the following settings:
+   - Build command: Not required (static site)
+   - Output directory: Root directory
+   - Node.js version: 20.x
+
+## Browser Support
+
 - Chrome 60+
-- Firefox 55+
+- Firefox 60+
 - Safari 12+
 - Edge 79+
 
-## 🚀 Deployment
-
-### Vercel (Recommended)
-The project includes `vercel.json` for easy Vercel deployment:
-
-1. Connect your GitHub repository to Vercel
-2. Vercel will automatically detect and deploy the project
-3. Your dashboard will be live at `your-project.vercel.app`
-
-### Other Platforms
-- **Netlify**: Drag and drop the project folder
-- **GitHub Pages**: Enable GitHub Pages in repository settings
-- **Firebase Hosting**: Use `firebase init` and `firebase deploy`
-
-## 🔒 Security Considerations
-
-- The dashboard is a frontend template and doesn't include backend authentication
-- For production use, implement proper authentication and authorization
-- Sanitize user inputs if adding form functionality
-- Use HTTPS in production environments
-
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
-## 📄 License
+## License
 
 This project is open source and available under the [MIT License](LICENSE).
 
-## 🆘 Support
+## Educational Purpose
 
-For support and questions:
-- Create an issue in the GitHub repository
-- Check the documentation for common solutions
-- Review the code comments for implementation details
+This playground is designed to help developers:
+- Learn XState concepts and patterns
+- Experiment with state machine configurations
+- Understand state transitions and event handling
+- Visualize complex state machines
+- Test state machine logic before implementation
 
----
+## Technical Details
 
-**ProAdmin Dashboard** - Professional admin interface for modern web applications.
-Built with ❤️ using HTML, CSS, and JavaScript.
+### State Machine Lifecycle
+1. **Creation**: Machine is created from JSON configuration
+2. **Interpretation**: Service is started to interpret the machine
+3. **Execution**: Events trigger state transitions
+4. **Visualization**: Canvas updates to reflect current state
+5. **Logging**: All transitions are logged for debugging
+
+### Canvas Rendering
+- States are rendered as rounded rectangles
+- Current state is highlighted with a distinct color
+- Transitions are shown as arrows between states
+- Layout is automatically calculated for optimal visualization
+
+### Error Handling
+- JSON validation with clear error messages
+- Graceful handling of malformed configurations
+- Fallback to default state machine on errors
+- User-friendly error display in the UI
