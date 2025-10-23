@@ -1,211 +1,276 @@
-# XState Interactive State Machine Playground
+# Node.js API Todo Manager
 
-A comprehensive interactive playground for exploring XState state machines. This web application allows you to create, visualize, and test state machine configurations with real-time visual feedback and execution capabilities.
+A simple REST API for managing todo items, built with Node.js and Express.js. This project demonstrates API development best practices including error handling, request validation, and proper HTTP status codes.
 
-## Features
+## 🚀 Features
 
-### Core Functionality
-- **Live State Machine Editor**: Edit JSON configuration in real-time with validation
-- **Visual State Machine Representation**: Interactive canvas showing states, transitions, and current active state
-- **State Machine Execution**: Send events to trigger state transitions
-- **Execution History**: Complete log of all state transitions with timestamps
+- **Complete CRUD Operations**: Create, Read, Update, and Delete todos
+- **Request Validation**: Ensures data integrity with input validation
+- **Error Handling**: Comprehensive error handling with meaningful messages
+- **RESTful API**: Follows REST conventions for API design
+- **Clean Code Structure**: Well-organized and maintainable codebase
+- **Status Management**: Track completion status of todos
 
-### State Machine Support
-- Multiple states (idle, loading, success, error, etc.)
-- Event-driven transitions (START, FETCH, RETRY, RESET, etc.)
-- Support for nested states and parallel states
-- Custom state metadata and styling
-
-### UI Features
-- Split-screen layout with editor and visualization
-- Real-time validation and error handling
-- Responsive design for desktop and mobile
-- Interactive event buttons for each available transition
-- Color-coded state visualization
-
-## Project Structure
+## 📁 Project Structure
 
 ```
-xstate/
-├── index.html          # Main HTML file with application layout
-├── script.js           # Core application logic and XState integration
-├── styles.css          # Complete styling for responsive design
-├── package.json        # Dependencies and project configuration
-├── vercel.json         # Vercel deployment configuration
-└── README.md           # This documentation
+node-todo-api/
+├── server.js           # Main application server
+├── api/
+│   ├── todo.js         # Todo API endpoints
+│   └── index.js        # API route aggregator
+├── model/
+│   └── todo.js         # Todo data model and logic
+├── package.json        # Project dependencies and scripts
+└── README.md           # This documentation file
 ```
 
-## Dependencies
+## 🛠️ Installation & Setup
 
-- **XState v5.26.0**: State machine library for creating, interpreting, and visualizing state machines
-- **Bootstrap v5.3.3**: CSS framework for responsive UI components
+### Prerequisites
+- Node.js (version 12 or higher)
+- npm (comes with Node.js)
 
-## Installation and Usage
+### Installation Steps
 
-### Local Development
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd xstate
+1. **Clone or download the project**
+   ```bash
+   # If you have the project files locally, navigate to the project directory
+   cd node-todo-api
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Start the server**
+   ```bash
+   npm start
+   ```
+
+4. **Verify installation**
+   - Open your browser and navigate to `http://localhost:3000`
+   - You should see the message: "Welcome to Node.js Todo API"
+
+## 📚 API Endpoints
+
+The API provides the following endpoints for managing todos:
+
+### Base URL
+`http://localhost:3000`
+
+### 1. Get All Todos
+```http
+GET /api/todos
 ```
 
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Start local development server:
-```bash
-# Using Python 3
-python -m http.server 8000
-
-# Using Node.js serve (if installed)
-npx serve .
-
-# Or open index.html directly in a browser
-```
-
-### Using the Playground
-
-1. **Load Examples**: Click the "Load Example" button to see pre-configured state machines
-2. **Edit Configuration**: Modify the JSON in the editor panel
-3. **Apply Changes**: Click "Apply Configuration" to update the state machine
-4. **Visualize**: Watch the state machine visualization update in real-time
-5. **Test Transitions**: Click event buttons to trigger state transitions
-6. **Monitor History**: View the execution history in the log panel
-
-## Configuration Format
-
-The state machine configuration follows XState format:
-
+**Response Example:**
 ```json
-{
-  "id": "machine-id",
-  "initial": "initial-state",
-  "states": {
-    "stateName": {
-      "on": {
-        "EVENT_NAME": "target-state"
-      }
-    }
+[
+  {
+    "id": 1,
+    "title": "Learn Node.js",
+    "completed": false,
+    "createdAt": "2024-01-01T00:00:00.000Z"
   }
+]
+```
+
+### 2. Create a New Todo
+```http
+POST /api/todos
+Content-Type: application/json
+
+{
+  "title": "Your todo title"
 }
 ```
 
-### Example Configurations
-
-#### Simple Toggle Machine
+**Response Example:**
 ```json
 {
-  "id": "toggle",
-  "initial": "inactive",
-  "states": {
-    "inactive": {
-      "on": { "TOGGLE": "active" }
-    },
-    "active": {
-      "on": { "TOGGLE": "inactive" }
-    }
-  }
+  "id": 2,
+  "title": "Your todo title",
+  "completed": false,
+  "createdAt": "2024-01-01T00:00:00.000Z"
 }
 ```
 
-#### Data Fetching Machine
+### 3. Get a Specific Todo
+```http
+GET /api/todos/:id
+```
+
+**Response Example:**
 ```json
 {
-  "id": "fetch",
-  "initial": "idle",
-  "states": {
-    "idle": {
-      "on": { "FETCH": "loading" }
-    },
-    "loading": {
-      "on": {
-        "RESOLVE": "success",
-        "REJECT": "failure"
-      }
-    },
-    "success": {
-      "on": { "RESET": "idle" }
-    },
-    "failure": {
-      "on": { "RETRY": "loading" }
-    }
-  }
+  "id": 1,
+  "title": "Learn Node.js",
+  "completed": false,
+  "createdAt": "2024-01-01T00:00:00.000Z"
 }
 ```
 
-## Event System
+### 4. Update a Todo
+```http
+PUT /api/todos/:id
+Content-Type: application/json
 
-The playground supports dynamic event handling:
-- Events are automatically detected from the state machine configuration
-- Buttons are generated for each available transition
-- Events can include payloads for complex state transitions
-- Real-time feedback shows which events are available in the current state
+{
+  "title": "Updated todo title",
+  "completed": true
+}
+```
 
-## State Machine Types Supported
+**Response Example:**
+```json
+{
+  "id": 1,
+  "title": "Updated todo title",
+  "completed": true,
+  "createdAt": "2024-01-01T00:00:00.000Z"
+}
+```
 
-- **Finite State Machines**: Simple state-to-state transitions
-- **Hierarchical State Machines**: Nested states with parent-child relationships
-- **Parallel State Machines**: Concurrent states that run simultaneously
-- **Extended State Machines**: States with context and extended data
+### 5. Delete a Todo
+```http
+DELETE /api/todos/:id
+```
 
-## Deployment
+**Response Example:**
+```json
+{
+  "message": "Todo deleted successfully"
+}
+```
 
-This project is configured for deployment on Vercel:
+### 6. Delete All Todos
+```http
+DELETE /api/todos
+```
 
-1. Connect your repository to Vercel
-2. Vercel will automatically detect the configuration from `vercel.json`
-3. The site will be deployed with the following settings:
-   - Build command: Not required (static site)
-   - Output directory: Root directory
-   - Node.js version: 20.x
+**Response Example:**
+```json
+{
+  "message": "All todos deleted successfully"
+}
+```
 
-## Browser Support
+## 🧪 Testing the API
 
-- Chrome 60+
-- Firefox 60+
-- Safari 12+
-- Edge 79+
+You can test the API using various tools:
 
-## Contributing
+### Using curl (Command Line)
+```bash
+# Get all todos
+curl http://localhost:3000/api/todos
+
+# Create a new todo
+curl -X POST http://localhost:3000/api/todos \
+  -H "Content-Type: application/json" \
+  -d '{"title": "My first todo"}'
+
+# Get a specific todo
+curl http://localhost:3000/api/todos/1
+
+# Update a todo
+curl -X PUT http://localhost:3000/api/todos/1 \
+  -H "Content-Type: application/json" \
+  -d '{"completed": true}'
+
+# Delete a todo
+curl -X DELETE http://localhost:3000/api/todos/1
+```
+
+### Using Postman or Insomnia
+1. Import the collection or create requests manually
+2. Set the base URL to `http://localhost:3000`
+3. Use the HTTP methods and endpoints as described above
+
+### Using JavaScript fetch
+```javascript
+// Create a todo
+fetch('http://localhost:3000/api/todos', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ title: 'Learn REST APIs' })
+})
+.then(response => response.json())
+.then(data => console.log(data));
+
+// Get all todos
+fetch('http://localhost:3000/api/todos')
+.then(response => response.json())
+.then(data => console.log(data));
+```
+
+## 📊 Error Handling
+
+The API includes comprehensive error handling:
+
+### Validation Errors (400 Bad Request)
+```json
+{
+  "error": "Title is required"
+}
+```
+
+### Not Found Errors (404 Not Found)
+```json
+{
+  "error": "Todo not found"
+}
+```
+
+### Server Errors (500 Internal Server Error)
+```json
+{
+  "error": "Internal server error"
+}
+```
+
+## 🔧 Development
+
+### Available Scripts
+- `npm start` - Start the server in production mode
+- `npm test` - Run tests (when test files are added)
+- `npm run dev` - Start server in development mode (if configured)
+
+### Adding New Features
+The project structure makes it easy to add new features:
+- **Routes**: Add new API endpoints in the `api/` directory
+- **Models**: Add data models and business logic in the `model/` directory
+- **Middleware**: Add Express middleware in `server.js`
+
+## 📝 Data Storage
+
+**Note**: This project uses an in-memory array for data storage, which means:
+- Data is lost when the server restarts
+- Suitable for development and testing purposes
+- For production use, consider integrating a database (MongoDB, PostgreSQL, etc.)
+
+## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## License
+## 📄 License
 
 This project is open source and available under the [MIT License](LICENSE).
 
-## Educational Purpose
+## 🔗 Related Technologies
 
-This playground is designed to help developers:
-- Learn XState concepts and patterns
-- Experiment with state machine configurations
-- Understand state transitions and event handling
-- Visualize complex state machines
-- Test state machine logic before implementation
+- **Node.js**: JavaScript runtime for server-side development
+- **Express.js**: Web application framework for Node.js
+- **REST**: Architectural style for designing networked applications
+- **JSON**: Data format for API requests and responses
 
-## Technical Details
+## 📞 Support
 
-### State Machine Lifecycle
-1. **Creation**: Machine is created from JSON configuration
-2. **Interpretation**: Service is started to interpret the machine
-3. **Execution**: Events trigger state transitions
-4. **Visualization**: Canvas updates to reflect current state
-5. **Logging**: All transitions are logged for debugging
-
-### Canvas Rendering
-- States are rendered as rounded rectangles
-- Current state is highlighted with a distinct color
-- Transitions are shown as arrows between states
-- Layout is automatically calculated for optimal visualization
-
-### Error Handling
-- JSON validation with clear error messages
-- Graceful handling of malformed configurations
-- Fallback to default state machine on errors
-- User-friendly error display in the UI
+If you have any questions or need help with this project, feel free to open an issue on GitHub or contact the project maintainers.
