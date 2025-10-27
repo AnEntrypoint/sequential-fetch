@@ -1,276 +1,191 @@
-# Node.js API Todo Manager
+# FetchFlow VM
 
-A simple REST API for managing todo items, built with Node.js and Express.js. This project demonstrates API development best practices including error handling, request validation, and proper HTTP status codes.
+Pure JavaScript drop-in replacement for fetchflow - a sequential fetch execution virtual machine with no external dependencies.
 
-## 🚀 Features
+## Features
 
-- **Complete CRUD Operations**: Create, Read, Update, and Delete todos
-- **Request Validation**: Ensures data integrity with input validation
-- **Error Handling**: Comprehensive error handling with meaningful messages
-- **RESTful API**: Follows REST conventions for API design
-- **Clean Code Structure**: Well-organized and maintainable codebase
-- **Status Management**: Track completion status of todos
+- ✅ **Zero dependencies** - pure JavaScript implementation
+- ✅ **No QuickJS** - eliminated heavy VM library
+- ✅ **Pauses on every fetch** - statement-by-statement execution
+- ✅ **State preservation** - resume execution from paused state
+- ✅ **Simple execution model** - regex-based parsing, eval-based execution
+- ✅ **Drop-in compatible** - matches fetchflow API
 
-## 📁 Project Structure
+## Installation
 
-```
-node-todo-api/
-├── server.js           # Main application server
-├── api/
-│   ├── todo.js         # Todo API endpoints
-│   └── index.js        # API route aggregator
-├── model/
-│   └── todo.js         # Todo data model and logic
-├── package.json        # Project dependencies and scripts
-└── README.md           # This documentation file
-```
-
-## 🛠️ Installation & Setup
-
-### Prerequisites
-- Node.js (version 12 or higher)
-- npm (comes with Node.js)
-
-### Installation Steps
-
-1. **Clone or download the project**
-   ```bash
-   # If you have the project files locally, navigate to the project directory
-   cd node-todo-api
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Start the server**
-   ```bash
-   npm start
-   ```
-
-4. **Verify installation**
-   - Open your browser and navigate to `http://localhost:3000`
-   - You should see the message: "Welcome to Node.js Todo API"
-
-## 📚 API Endpoints
-
-The API provides the following endpoints for managing todos:
-
-### Base URL
-`http://localhost:3000`
-
-### 1. Get All Todos
-```http
-GET /api/todos
-```
-
-**Response Example:**
-```json
-[
-  {
-    "id": 1,
-    "title": "Learn Node.js",
-    "completed": false,
-    "createdAt": "2024-01-01T00:00:00.000Z"
-  }
-]
-```
-
-### 2. Create a New Todo
-```http
-POST /api/todos
-Content-Type: application/json
-
-{
-  "title": "Your todo title"
-}
-```
-
-**Response Example:**
-```json
-{
-  "id": 2,
-  "title": "Your todo title",
-  "completed": false,
-  "createdAt": "2024-01-01T00:00:00.000Z"
-}
-```
-
-### 3. Get a Specific Todo
-```http
-GET /api/todos/:id
-```
-
-**Response Example:**
-```json
-{
-  "id": 1,
-  "title": "Learn Node.js",
-  "completed": false,
-  "createdAt": "2024-01-01T00:00:00.000Z"
-}
-```
-
-### 4. Update a Todo
-```http
-PUT /api/todos/:id
-Content-Type: application/json
-
-{
-  "title": "Updated todo title",
-  "completed": true
-}
-```
-
-**Response Example:**
-```json
-{
-  "id": 1,
-  "title": "Updated todo title",
-  "completed": true,
-  "createdAt": "2024-01-01T00:00:00.000Z"
-}
-```
-
-### 5. Delete a Todo
-```http
-DELETE /api/todos/:id
-```
-
-**Response Example:**
-```json
-{
-  "message": "Todo deleted successfully"
-}
-```
-
-### 6. Delete All Todos
-```http
-DELETE /api/todos
-```
-
-**Response Example:**
-```json
-{
-  "message": "All todos deleted successfully"
-}
-```
-
-## 🧪 Testing the API
-
-You can test the API using various tools:
-
-### Using curl (Command Line)
 ```bash
-# Get all todos
-curl http://localhost:3000/api/todos
-
-# Create a new todo
-curl -X POST http://localhost:3000/api/todos \
-  -H "Content-Type: application/json" \
-  -d '{"title": "My first todo"}'
-
-# Get a specific todo
-curl http://localhost:3000/api/todos/1
-
-# Update a todo
-curl -X PUT http://localhost:3000/api/todos/1 \
-  -H "Content-Type: application/json" \
-  -d '{"completed": true}'
-
-# Delete a todo
-curl -X DELETE http://localhost:3000/api/todos/1
+npm install fetchflow-vm
 ```
 
-### Using Postman or Insomnia
-1. Import the collection or create requests manually
-2. Set the base URL to `http://localhost:3000`
-3. Use the HTTP methods and endpoints as described above
+## Usage
 
-### Using JavaScript fetch
+### Basic Execution
+
 ```javascript
-// Create a todo
-fetch('http://localhost:3000/api/todos', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
+const { executeCode, SequentialFetchVM } = require('fetchflow-vm');
+
+// Simple code execution
+const result = await executeCode('const x = 10; x * 2');
+console.log(result.result); // 20
+```
+
+### Fetch Detection & Pause/Resume
+
+```javascript
+const { SequentialFetchVM } = require('fetchflow-vm');
+
+const vm = new SequentialFetchVM();
+await vm.initialize();
+
+// Execute code - pauses at fetch
+const pauseResult = await vm.executeCode(`
+  const userId = 123;
+  const user = fetch('https://api.example.com/user/' + userId);
+  user.name
+`);
+
+// pauseResult.type === 'pause'
+// pauseResult.fetchRequest.url === 'https://api.example.com/user/123'
+// pauseResult.state === 1 (fetch ID)
+
+// Resume execution with response
+const finalResult = await vm.resumeExecution(pauseResult.state, {
+  name: 'Alice'
+});
+
+console.log(finalResult.result); // 'Alice'
+vm.dispose();
+```
+
+### Sequential Multiple Fetches
+
+```javascript
+const vm = new SequentialFetchVM();
+await vm.initialize();
+
+const p1 = await vm.executeCode(`
+  const resp1 = fetch('https://api.example.com/data/1');
+  const resp2 = fetch('https://api.example.com/data/2');
+  resp1.value + resp2.value
+`);
+
+// First pause at first fetch
+const p2 = await vm.resumeExecution(p1.state, { value: 10 });
+
+// Second pause at second fetch
+const p3 = await vm.resumeExecution(p2.state, { value: 20 });
+
+console.log(p3.result); // 30
+vm.dispose();
+```
+
+## API
+
+### SequentialFetchVM
+
+#### Constructor
+```javascript
+new SequentialFetchVM(options = {})
+```
+
+#### Methods
+
+- **`initialize()`** - Initialize the VM (idempotent)
+  - Returns: Promise<void>
+
+- **`executeCode(code)`** - Execute JavaScript code
+  - Parameter: `code` (string) - JavaScript code to execute
+  - Returns: Promise<{type: 'pause'|'complete'|'error', ...}>
+
+- **`resumeExecution(fetchId, response)`** - Resume from paused fetch
+  - Parameters:
+    - `fetchId` - State ID from previous pause
+    - `response` - Mock response object for fetch
+  - Returns: Promise<{type: 'pause'|'complete'|'error', ...}>
+
+- **`dispose()`** - Clean up resources
+  - Returns: void
+
+#### Result Objects
+
+**Pause Result** (when fetch is encountered):
+```javascript
+{
+  type: 'pause',
+  result: null,
+  state: <fetchId>,
+  fetchRequest: {
+    id: <fetchId>,
+    url: <fetchUrl>,
+    options: null
   },
-  body: JSON.stringify({ title: 'Learn REST APIs' })
-})
-.then(response => response.json())
-.then(data => console.log(data));
-
-// Get all todos
-fetch('http://localhost:3000/api/todos')
-.then(response => response.json())
-.then(data => console.log(data));
-```
-
-## 📊 Error Handling
-
-The API includes comprehensive error handling:
-
-### Validation Errors (400 Bad Request)
-```json
-{
-  "error": "Title is required"
+  history: []
 }
 ```
 
-### Not Found Errors (404 Not Found)
-```json
+**Complete Result** (execution finished):
+```javascript
 {
-  "error": "Todo not found"
+  type: 'complete',
+  result: <lastExpressionValue>,
+  history: [...]
 }
 ```
 
-### Server Errors (500 Internal Server Error)
-```json
+**Error Result** (execution failed):
+```javascript
 {
-  "error": "Internal server error"
+  type: 'error',
+  error: <errorMessage>,
+  history: [...]
 }
 ```
 
-## 🔧 Development
+### executeCode(code)
 
-### Available Scripts
-- `npm start` - Start the server in production mode
-- `npm test` - Run tests (when test files are added)
-- `npm run dev` - Start server in development mode (if configured)
+Convenience function for one-off code execution:
+```javascript
+const result = await executeCode('const x = 5; x + 3');
+```
 
-### Adding New Features
-The project structure makes it easy to add new features:
-- **Routes**: Add new API endpoints in the `api/` directory
-- **Models**: Add data models and business logic in the `model/` directory
-- **Middleware**: Add Express middleware in `server.js`
+Auto-disposes VM after completion.
 
-## 📝 Data Storage
+## Architecture
 
-**Note**: This project uses an in-memory array for data storage, which means:
-- Data is lost when the server restarts
-- Suitable for development and testing purposes
-- For production use, consider integrating a database (MongoDB, PostgreSQL, etc.)
+- **Parsing**: Regex-based statement splitting
+- **Execution**: Statement-by-statement with eval() in variable scope
+- **Fetch Detection**: Simple string pattern matching for `fetch(` calls
+- **State**: In-memory variable tracking with paused state preservation
 
-## 🤝 Contributing
+## Limitations
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+**By Design:** This library is optimized for **simple sequential data flow** - fetch calls with variable tracking across runtimes.
 
-## 📄 License
+**Not Supported:**
+- Loops (for, while, do-while)
+- Conditionals (if/else, switch)
+- Function definitions or calls
+- async/await
+- Closures and complex scoping
+- Advanced JavaScript features
 
-This project is open source and available under the [MIT License](LICENSE).
+**Why?** Supporting these would require a runtime-specific engine (QuickJS, V8, etc.), breaking cross-runtime compatibility (Node/Bun/Deno/Google Apps Script). The current design uses only built-in JavaScript primitives (`eval`, regex parsing) that work everywhere.
 
-## 🔗 Related Technologies
+**Intended Use Case:** Code that looks like:
+```javascript
+const userId = 123;
+const user = fetch('https://api.example.com/user/' + userId);
+const posts = fetch('https://api.example.com/posts?userId=' + user.id);
+posts.length
+```
 
-- **Node.js**: JavaScript runtime for server-side development
-- **Express.js**: Web application framework for Node.js
-- **REST**: Architectural style for designing networked applications
-- **JSON**: Data format for API requests and responses
+**Not Intended For:**
+```javascript
+for (let i = 0; i < 10; i++) {
+  const data = fetch(...);  // Won't work - loops not executed
+}
 
-## 📞 Support
-
-If you have any questions or need help with this project, feel free to open an issue on GitHub or contact the project maintainers.
+function getData() {
+  return fetch(...);  // Won't work - functions not callable
+}
+```
