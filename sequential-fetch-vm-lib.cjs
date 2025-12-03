@@ -90,9 +90,10 @@ class SequentialFetchVM {
   _eval(expr) {
     const trimmed = expr.trim();
 
-    if (trimmed === 'true' || trimmed === 'false' || trimmed === 'null' || trimmed === 'undefined') {
-      return eval(trimmed);
-    }
+    if (trimmed === 'true') return true;
+    if (trimmed === 'false') return false;
+    if (trimmed === 'null') return null;
+    if (trimmed === 'undefined') return undefined;
 
     if (/^-?\d+(\.\d+)?$/.test(trimmed)) return Number(trimmed);
 
@@ -115,7 +116,8 @@ class SequentialFetchVM {
     }
 
     try {
-      return eval('(' + expr2 + ')');
+      const fn = new Function('return (' + expr2 + ')');
+      return fn();
     } catch {
       return undefined;
     }

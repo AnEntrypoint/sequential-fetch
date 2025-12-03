@@ -1,5 +1,5 @@
 {
-  "name": "sequential-fetch",
+  "name": "@sequential/sequential-fetch",
   "version": "1.0.0",
   "description": "Pure JavaScript VM that pauses on every fetch() call. Drop-in replacement for fetchflow. Works in Node.js, Bun, Deno, and Google Apps Script with zero dependencies.",
   "main": "sequential-fetch-vm-lib.cjs",
@@ -8,9 +8,7 @@
     "test": "node test-commonjs.js"
   },
   "dependencies": {},
-  "devDependencies": {
-    "@types/node": "^20.0.0"
-  },
+  "devDependencies": {},
   "keywords": [
     "fetchflow",
     "sequential-fetch",
